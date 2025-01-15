@@ -1,0 +1,64 @@
+	AREA RESET, DATA, READONLY
+		EXPORT __Vectors
+
+__Vectors
+	dcd 0x10001000
+	dcd Reset_Handler
+	
+	AREA mycode, CODE, READONLY
+	ENTRY
+	EXPORT Reset_Handler
+
+Reset_Handler
+	ldr r0, =src
+	ldr r1, =dst
+	mov r2, #10 ; counter
+loop
+	ldr r3, [r0]
+	str r3, [r1]
+	add r0, #4
+	add r1, #4
+	subs r2, #1
+	bne loop ; loop back if counter is not 0
+	
+STOP B STOP
+
+	AREA mydata, DATA, READONLY
+src dcd 0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555, 0x66666666, 0x77777777, 0x88888888, 0x99999999, 0x12121212
+	AREA mydata2, DATA, READWRITE
+dst dcd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	END
+		
+/*
+output:
+R0: 0x00000054
+R1: 0x10000028
+R2: 0x00000000
+R3: 0x12121212
+
+src:
+addr       ||       val
+0x0000002C    0x11111111
+0x00000030    0x22222222
+0x00000034    0x33333333
+0x00000038    0x44444444
+0x0000003C    0x55555555
+0x00000040    0x66666666
+0x00000044    0x77777777
+0x00000048    0x88888888
+0x0000004C    0x99999999
+0x00000050    0x12121212
+
+dst:
+addr       ||       val
+0x10000000    0x11111111
+0x10000004    0x22222222
+0x10000008    0x33333333
+0x1000000C    0x44444444
+0x10000010    0x55555555
+0x10000014    0x66666666
+0x10000018    0x77777777
+0x1000001C    0x88888888
+0x10000020    0x99999999
+0x10000024    0x12121212
+*/
