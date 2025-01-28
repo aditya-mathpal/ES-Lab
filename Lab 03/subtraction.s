@@ -34,6 +34,6 @@ R2: 0x44444444
 R3: 0x11111111
 
 value1: addr: 0x00000018 val: 0x55555555
-value1: addr: 0x0000001C val: 0x44444444
+value2: addr: 0x0000001C val: 0x44444444
 result: addr: 0x10000000 val: 0x11111111
 */
