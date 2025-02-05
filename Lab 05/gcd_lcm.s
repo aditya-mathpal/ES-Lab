@@ -1,0 +1,1 @@
+; Find gcd and lcm of two numbers

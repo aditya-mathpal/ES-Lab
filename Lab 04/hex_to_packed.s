@@ -18,21 +18,21 @@ Reset_Handler
  
 x 
     cmp r0, #10 
-    bcc xx 
-    sub r0, r0, #10 
-    add r2, r2, #1 
+    bcc xx ; if r0 < 10 branch to xx
+    sub r0, r0, #10 ; r0 -= 10
+    add r2, r2, #1 ; r2 += 1 r2: quotient
     b x 
  
 xx 
-    mov r4, r0, LSL r3 
-    add r3, r3, #4
-    orr r1, r1, r4 
-    mov r0, r2
-    cmp r0, #0 
+    mov r4, r0, LSL r3 ; store first remainder then barrel shift left one nibble
+    add r3, r3, #4 ; r3 += 4
+    orr r1, r1, r4 ; 
+    mov r0, r2 ; make the old quotient the new dividend
+    cmp r0, #0
 	ldr r5, =bcd
 	str r1, [r5]
-    beq stop
-    mov r2, #0 
+    beq stop ; if r0 == 0, end
+    mov r2, #0
 	b x
 stop b stop
 
