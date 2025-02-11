@@ -33,10 +33,10 @@ process_byte
     mov r5, #1 ; set carry
 lower_adjust
     mla r3, r11, r4, r3
-    mov r4, r4, LSL #4 ; shift left by one byte
-    mov r9, r7, LSR #4 ; extract upper nibble from num1
+    mov r4, r4, lsl #4 ; shift left by one byte
+    mov r9, r7, lsr #4 ; extract upper nibble from num1
     and r9, #0x0F
-    mov r10, r8, LSR #4 ; extract upper nibble from num2
+    mov r10, r8, lsr #4 ; extract upper nibble from num2
     and r10, #0x0F
     add r11, r9, r10 ; add nibbles
     add r11, r11, r5 ; add carry
@@ -47,7 +47,7 @@ lower_adjust
     mov r5, #1 ; set carry
 upper_adjust
     mla r3, r11, r4, r3
-    mov r4, r4, LSL #4
+    mov r4, r4, lsl #4
     subs r6, #1 ; r6--
     bne process_byte
     str r3, [r2]
