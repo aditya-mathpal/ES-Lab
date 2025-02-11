@@ -24,7 +24,6 @@ Reset_Handler
 	beq stop; stop if r1 == 0
 	str r3, [r0], #1 ; store 1 in dst
 	b fibonacci
-	b stop
 stop
 	b stop
 
@@ -52,7 +51,7 @@ R2: 0x00000002
 R3: 0x00000003
 R5: 0x00000003
 
-n:   addr: 0x00000048 val: 0x00000005
+n: addr: 0x00000044 val: 0x00000005
 dst:
 addr      |       val
 0x10000000 0x00000000
