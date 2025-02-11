@@ -21,11 +21,11 @@ x	ldr r4, [r0] ; load each number to r4
 	add r0, #4 ; move r0 to next number
 	adds r3, r4 ; add each number to r3
 	bcc xx
-	add r5, #1 ; if carry is generated, increment r5
+	add r5, #1 ; if carry is generated, increment r5 (upper word)
 xx	subs r2, #1 ; decrement counter
 	bne x
-	str r3, [r1] ; store lower half
-	str r5, [r1, #4] ; store upper half
+	str r3, [r1] ; store lower word
+	str r5, [r1, #4] ; store upper word
 stop b stop
 
 	AREA mydata, DATA, READONLY

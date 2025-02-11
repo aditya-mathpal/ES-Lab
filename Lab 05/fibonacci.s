@@ -15,19 +15,15 @@ Reset_Handler
 	ldr r0, =n
 	ldr r1, [r0] ; r1 <- n
 	ldr r0, =dst
-	mov r2, #0
-	mov r3, #1
-	subs r1, #1
-	bne x
-	mov r5, r2
-	str r5, [r0], #1
-	b stop
-x	subs r1, #1
-	bne xx
-	mov r5, r3
-	str r5, [r0], #1
-	b stop
-xx	bl fibonacci
+	mov r2, #0 ; f(1)
+	mov r3, #1 ; f(2)
+	subs r1, #1 ; r1--
+	beq stop ; stop if r1 == 0
+	str r2, [r0], #1 ; store 0 in dst
+	subs r1, #1 ; r--
+	beq stop; stop if r1 == 0
+	str r3, [r0], #1 ; store 1 in dst
+	b fibonacci
 	b stop
 stop
 	b stop
@@ -39,15 +35,29 @@ fibonacci
 	mov r3, r5
 	subs r1, #1
 	bne fibonacci
+	b stop
 
 	AREA mydata, DATA, READONLY
 n dcd 5
 	AREA mydata2, DATA, READWRITE
-dst dcd 0
+dst dcd 0, 0
 	
 	END
 
 /*
 output:
-n:   addr: 0x00000050
-dst: addr: 0x10000000
+R0: 0x10000005
+R1: 0x00000000
+R2: 0x00000002
+R3: 0x00000003
+R5: 0x00000003
+
+n:   addr: 0x00000048 val: 0x00000005
+dst:
+addr      |       val
+0x10000000 0x00000000
+0x10000001 0x00000001
+0x10000002 0x00000001
+0x10000003 0x00000002
+0x10000004 0x00000003
+*/
