@@ -55,11 +55,11 @@ stop
     b stop
 
     AREA mydata, DATA, READONLY
-num1 dcd 0x00000145     ; BCD 145
-num2 dcd 0x00000123     ; BCD 123
+num1 dcd 0x00000145 ; bcd 145
+num2 dcd 0x00000123 ; bcd 123
 
     AREA result, DATA, READWRITE
-dst dcd 0              ; Result storage
+dst dcd 0 ; should be 0x0268
 
     END
 
