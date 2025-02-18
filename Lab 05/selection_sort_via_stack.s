@@ -19,25 +19,27 @@ Reset_Handler
 	ldr r4, =0x2
 	stmia r13!, {r0-r4}
 	mov r0, r13
-xx	mov r1, r0
+outer
+	mov r1, r0
 	mov r2, r0
 	sub r2, #4
 	add r12, r11, #1
-x	ldmdb r1, {r3}
+inner
+	ldmdb r1, {r3}
 	ldmdb r2, {r4}
 	cmp r3, r4
 	movlo r1, r2
 	sub r2, #4
 	add r12, #1
 	cmp r12, #5
-	bne x
+	bne inner
 	ldmdb r1!, {r3}
 	ldmdb r0!, {r4}
 	stmia r0, {r3}
 	stmia r1, {r4}
 	add r11, #1
 	cmp r11, #4
-	bne xx
+	bne outer
 	
 	end
 
