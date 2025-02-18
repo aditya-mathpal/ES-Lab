@@ -15,36 +15,36 @@ Reset_Handler
 	ldr r0, =arr
 	ldr r2, =dst
 	mov r1, #10 ; counter
-l	ldr r3, [r0], #1 ; load number from src
-	str r3, [r2], #1 ; store number to dst
+l	ldrb r3, [r0], #1 ; load number from src
+	strb r3, [r2], #1 ; store number to dst
 	subs r1, #1 ; decrement counter
 	bne l ; repeat till all numbers are transferred from src to dst
 	ldr r0, =dst
 	mov r1, #0 ; i ~ r1 <- 0
-	mov r2, #0
-	mov r3, #0
-	mov r4, #0
 outer
 	mov r3, r1 ; minIndex ~ r3 <- i
-	mov r4, [r0] ; 
-	ldrb r5, [r0], #1 ; r5 = 
+	add r4, r0, r1 ; r4 <- &arr[i]
+	ldrb r5, [r4] ; r5 <- arr[minIndex]
 	add r2, r1, #1 ; j ~ r2 <- i+1
-	mov r6, r0
 inner
-	mov r7, r6
-	ldrb r8, [r6], #1
-	cmp r5, r8
-	movhi r3, r7
-	add r2, #1
-	cmp r2, #10
-	bne inner
-	ldrb r9, [r3]
-	ldrb r10, [r4]
-	strb r9, [r4]
-	strb r10, [r3]
-	add r1, #1
-	cmp r1, #9
-	bne outer
+	add r6, r0, r2 ; r6 <- &arr[j]
+	ldrb r7, [r6] ; r7 <- arr[j]
+	cmp r5, r7 ; if(arr[minIndex] > arr[j])
+    bls skip
+	mov r3, r2 ; then minIndex = j
+	ldrb r5, [r6] ; then r5 <- arr[minIndex]
+skip
+	add r2, #1 ; r2++
+	cmp r2, #10 ; if(r2 > 10) array end
+	bne inner ; then repeat
+	add r6, r0, r3 ; r6 <- &arr[minIndex]
+	ldrb r8, [r4] ; r8 <- arr[i]
+	ldrb r9, [r6] ; r9 <- arr[minIndex]
+	strb r8, [r6] ; arr[minIndex] <- r8
+	strb r9, [r4] ; arr[i] <- r9
+	add r1, #1 ; r1++
+	cmp r1, #9 ; if(r1 < n-1)
+	bne outer ; then repeat
 stop b stop
 
 arr dcb 0x10, 0x05, 0x33, 0x24, 0x56, 0x77, 0x21, 0x04, 0x87, 0x01
@@ -57,7 +57,7 @@ dst dcb 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 output:
 arr:
 addr      |       val
-0x00000070
+0x00000060
 
 dst:
 addr      |       val
