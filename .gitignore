@@ -11,3 +11,4 @@
 *.lnp
 test.s
 *.dbgconf
+.vscode/
