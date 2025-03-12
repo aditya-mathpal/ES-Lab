@@ -82,23 +82,23 @@ unsigned int random_number() {
 
 void EINT3_IQRHandler() {
     unsigned char die_result[2];
-    if(LPC_GPIOINT->IO2IntStatF & (1<<12)) { // Check if SW2 (P2.12) caused the interrupt
+    if(LPC_GPIOINT->IO2IntStatF & (1<<12)) { // check if SW2 (P2.12) caused the interrupt
         unsigned int number = random_number();
-        die_result[0] = number + '0'; // Convert number to ASCII
+        die_result[0] = number + '0'; // convert number to ASCII
         die_result[1] = 0;
-        lcd_comdata(0x01, 0); // Clear display
+        lcd_comdata(0x01, 0); // clear display
         delay_lcd(10000);
-        lcd_puts(&die_result[0]); // Display the result
+        lcd_puts(&die_result[0]); // display the result
         LPC_GPIOINT->IO2IntClr |= (1<<12); // Clear interrupt flag
     }
 }
 
 int main() {
     SystemInit();
-    LPC_PINCON->PINSEL4 &= ~(3<<24); // Set P2.12 as GPIO
-    LPC_GPIO2->FIODIR &= ~(1<<12); // Set P2.12 as input
-    LPC_GPIOINT->IO2IntEnF |= (1<<12); // Enable falling edge interrupt on P2.12
-    NVIC_EnableIRQ(EINT3_IRQn); // Enable EINT3 interrupt
+    LPC_PINCON->PINSEL4 &= ~(3<<24); // set P2.12 as GPIO
+    LPC_GPIO2->FIODIR &= ~(1<<12); // set P2.12 as input
+    LPC_GPIOINT->IO2IntEnF |= (1<<12); // enable falling edge interrupt on P2.12
+    NVIC_EnableIRQ(EINT3_IRQn); // enable EINT3 interrupt
     lcd_init();
     lcd_comdata(0x80, 0);
     delay_lcd(800);
