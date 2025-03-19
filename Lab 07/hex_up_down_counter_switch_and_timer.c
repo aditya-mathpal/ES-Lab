@@ -1,37 +1,63 @@
 #include<LPC17xx.h>
 
 unsigned char tohex[16]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F,0x77,0x7C,0x39,0x5E,0x79,0x71};
-long int arr[4]={0,0,0,0};
-unsigned int i,j,dir=0;
+
+unsigned int i, j, sw;
+
+void downCounter(unsigned int* digit) {
+	int borrow = 1;
+	for(i = 3; i < 4; i--) {
+		if(digit[i] >= borrow) {
+			digit[i] -= borrow;
+			borrow = 0;
+		}
+		else {
+			digit[i] = 15;
+			borrow = 1;
+		}
+	}
+}
+
+void upCounter(unsigned int* digit) {
+	int borrow = 0;
+	for(i = 3; i < 4; i--) {
+		if(digit[i] < 15) {
+			digit[i]++;
+			borrow = 0;
+			break;
+		} else {
+			digit[i] = 0;
+			borrow = 1;
+		}
+	}
+}
+
+void delayTimer (unsigned int seconds) {
+	LPC_TIM0->TC =0;
+	LPC_TIM0->TCR = 0x02;
+	LPC_TIM0->TCR = 0x01;
+	while(LPC_TIM0->TC < seconds);
+	LPC_TIM0->TCR = 0x00;
+}
 
 int main(){
-    LPC_GPIO0->FIODIR|=0xFF0;
+	  unsigned int arr[4]={15,15,15,15};
+		LPC_PINCON->PINSEL0=0x0;
+		LPC_PINCON->PINSEL3=0x0;
+    LPC_GPIO0->FIODIR|=0xFF<<4;
     LPC_GPIO1->FIODIR|=0xF<<23;
-    LPC_GPIO2->FIODIR&=~(1<<0);
-    LPC_TIM0->CTCR=0x0;
-    LPC_TIM0->PR=25000000-1;
     while(1){
+			sw = LPC_GPIO0->FIOPIN & (1<<21);
+			if (sw) {
+				upCounter(arr);
+			} else {
+				downCounter(arr);
+			}
         for(i=0;i<4;i++){
             LPC_GPIO1->FIOPIN=i<<23;
-            LPC_GPIO0->FIOPIN=tohex[arr[i]]<<4;
-            for(j=0;j<1000;j++);
+            LPC_GPIO0->FIOPIN=tohex[arr[3-i]]<<4;
+						delayTimer(10000);
         }
-        dir=(LPC_GPIO2->FIOPIN&1)?1:0;
-        if(LPC_TIM0->TC>=1000){
-            LPC_TIM0->TCR=0x02;
-            LPC_TIM0->TCR=0x01;
-            if(dir){
-                arr[0]++;
-                if(arr[0]>15){arr[0]=0;arr[1]++;
-                    if(arr[1]>15){arr[1]=0;arr[2]++;
-                        if(arr[2]>15){arr[2]=0;arr[3]++;
-                            if(arr[3]>15)arr[3]=0;}}}
-            }else{
-                arr[0]--;
-                if(arr[0]<0){arr[0]=15;arr[1]--;
-                    if(arr[1]<0){arr[1]=15;arr[2]--;
-                        if(arr[2]<0){arr[2]=15;arr[3]--;
-                            if(arr[3]<0)arr[3]=15;}}}}
-        }
+				delayTimer(1);
     }
 }
