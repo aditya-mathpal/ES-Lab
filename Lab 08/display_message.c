@@ -14,6 +14,21 @@ void delay_lcd(unsigned int r1) {
     return;
 }
 
+void write(int temp2, int type) {
+    clear_ports();
+    LPC_GPIO0->FIOPIN = temp2; // Assign the value to the data lines
+    if(type == 0) {
+        LPC_GPIO0->FIOCLR = 1<<27; // RS is 0
+    } else {
+        LPC_GPIO0->FIOSET = 1<<27; // RS is 1
+    }
+    LPC_GPIO0->FIOSET = 1<<28; // generate enable
+    delay_lcd(25);
+    LPC_GPIO0->FIOCLR = 1<<28; // disable enable
+    delay_lcd(1000);
+    return;
+}
+
 void lcd_comdata(int temp1, int type) {
     int temp2 = temp1 & 0xF0; //move data (26-8+1) times : 26-HN place, 4 bits
     temp2 = temp2 << 19; //data lines from 23 to 26
@@ -47,21 +62,6 @@ void lcd_init() {
     return;
 }
 
-void write(int temp2, int type) {
-    clear_ports();
-    LPC_GPIO0->FIOPIN = temp2; // Assign the value to the data lines
-    if(type == 0) {
-        LPC_GPIO0->FIOCLR = 1<<27; // RS is 0
-    } else {
-        LPC_GPIO0->FIOSET = 1<<27; // RS is 1
-    }
-    LPC_GPIO0->FIOSET = 1<<28; // generate enable
-    delay_lcd(25);
-    LPC_GPIO0->FIOCLR = 1<<28; // disable enable
-    delay_lcd(1000);
-    return;
-}
-
 void lcd_puts(unsigned char* buf1) {
     unsigned int i=0;
     while(buf1[i] != '\0') {
@@ -75,7 +75,7 @@ void lcd_puts(unsigned char* buf1) {
 }
 
 int main() {
-    unsigned char msg1[4] = {"MIT"}, msg2[19] = {"Department of CSE:"};
+    unsigned char msg1[4] = {"MIT"}, msg2[13] = {"Dept. of CSE"};
     SystemInit();
     SystemCoreClockUpdate();
     lcd_init();
