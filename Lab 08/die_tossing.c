@@ -76,31 +76,24 @@ void lcd_puts(unsigned char* buf1) {
 }
 
 int main() {
-    unsigned char die_roll[2];
-    SystemInit();
-    SystemCoreClockUpdate();
-    lcd_init();
-		unsigned int sw;
-    
-    // Display "Dice output:" on the first line
-    lcd_comdata(0x80, 0);
-    delay_lcd(800);
-    lcd_puts("Dice output:");
-
-    while(1) {
-				sw = LPC_GPIO0->FIOPIN & (1<<21);
-        // Check if switch (assumed to be connected to P0.21) is pressed
-            // Generate a random number between 1 and 6
-            die_roll[0] = (rand() % 6) + 1 + '0'; // Convert to ASCII
-            die_roll[1] = '\0'; // Null-terminate the string
-
-            // Display the result on the second line
-            lcd_comdata(0xC0, 0); // Set cursor to the second line
-            delay_lcd(800);
-						if(sw) {
-							lcd_puts(die_roll); // Display the die roll result
-						}
-
-            delay_lcd(1000000); // Wait for a while before checking again
-    }
+    int randNum = 2, randInt = 0;
+	unsigned char Msg1[1];
+	SystemInit();
+	SystemCoreClockUpdate();
+	LPC_PINCON->PINSEL4 &= 0xF0FFFFFF;
+	LPC_GPIO2->FIODIR &= ~(1 << 12);
+	lcd_init();
+	while(1) {
+		if((LPC_GPIO2->FIOPIN & (1 << 12)) == 0) {
+			randNum = randInt % 6 + 1;
+			lcd_comdata(0x01, 0);
+			delay_lcd(10000);
+			lcd_comdata(0x80, 0);
+			delay_lcd(800);
+			lcd_puts(&Msg1[0]);
+		}
+		Msg1[0] = randNum + 48;
+		randInt++;
+	}
+			
 }
