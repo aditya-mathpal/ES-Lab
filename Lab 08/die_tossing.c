@@ -1,4 +1,5 @@
 #include<LPC17XX.h>
+#include<stdlib.h>
 
 void clear_ports() {
     /* clearing the lines at power on */
@@ -11,6 +12,21 @@ void clear_ports() {
 void delay_lcd(unsigned int r1) {
     unsigned int r;
     for(r=0;r<r1;r++);
+    return;
+}
+
+void write(int temp2, int type) {
+    clear_ports();
+    LPC_GPIO0->FIOPIN = temp2; // Assign the value to the data lines
+    if(type == 0) {
+        LPC_GPIO0->FIOCLR = 1<<27; // RS is 0
+    } else {
+        LPC_GPIO0->FIOSET = 1<<27; // RS is 1
+    }
+    LPC_GPIO0->FIOSET = 1<<28; // generate enable
+    delay_lcd(25);
+    LPC_GPIO0->FIOCLR = 1<<28; // disable enable
+    delay_lcd(1000);
     return;
 }
 
@@ -47,21 +63,6 @@ void lcd_init() {
     return;
 }
 
-void write(int temp2, int type) {
-    clear_ports();
-    LPC_GPIO0->FIOPIN = temp2; // Assign the value to the data lines
-    if(type == 0) {
-        LPC_GPIO0->FIOCLR = 1<<27; // RS is 0
-    } else {
-        LPC_GPIO0->FIOSET = 1<<27; // RS is 1
-    }
-    LPC_GPIO0->FIOSET = 1<<28; // generate enable
-    delay_lcd(25);
-    LPC_GPIO0->FIOCLR = 1<<28; // disable enable
-    delay_lcd(1000);
-    return;
-}
-
 void lcd_puts(unsigned char* buf1) {
     unsigned int i=0;
     while(buf1[i] != '\0') {
@@ -74,33 +75,32 @@ void lcd_puts(unsigned char* buf1) {
     return;
 }
 
-unsigned int random_number() {
-    static unsigned int seed = 12345;
-    seed = (seed * 1103515245 + 12435) & 0x7FFFFFFF;
-    return (seed % 6) + 1; // generate a number from 1 to 6
-}
-
-void EINT3_IQRHandler() {
-    unsigned char die_result[2];
-    if(LPC_GPIOINT->IO2IntStatF & (1<<12)) { // check if SW2 (P2.12) caused the interrupt
-        unsigned int number = random_number();
-        die_result[0] = number + '0'; // convert number to ASCII
-        die_result[1] = 0;
-        lcd_comdata(0x01, 0); // clear display
-        delay_lcd(10000);
-        lcd_puts(&die_result[0]); // display the result
-        LPC_GPIOINT->IO2IntClr |= (1<<12); // Clear interrupt flag
-    }
-}
-
 int main() {
+    unsigned char die_roll[2];
     SystemInit();
-    LPC_PINCON->PINSEL4 &= ~(3<<24); // set P2.12 as GPIO
-    LPC_GPIO2->FIODIR &= ~(1<<12); // set P2.12 as input
-    LPC_GPIOINT->IO2IntEnF |= (1<<12); // enable falling edge interrupt on P2.12
-    NVIC_EnableIRQ(EINT3_IRQn); // enable EINT3 interrupt
+    SystemCoreClockUpdate();
     lcd_init();
+		unsigned int sw;
+    
+    // Display "Dice output:" on the first line
     lcd_comdata(0x80, 0);
     delay_lcd(800);
-    while(1); // infinite loop
+    lcd_puts("Dice output:");
+
+    while(1) {
+				sw = LPC_GPIO0->FIOPIN & (1<<21);
+        // Check if switch (assumed to be connected to P0.21) is pressed
+            // Generate a random number between 1 and 6
+            die_roll[0] = (rand() % 6) + 1 + '0'; // Convert to ASCII
+            die_roll[1] = '\0'; // Null-terminate the string
+
+            // Display the result on the second line
+            lcd_comdata(0xC0, 0); // Set cursor to the second line
+            delay_lcd(800);
+						if(sw) {
+							lcd_puts(die_roll); // Display the die roll result
+						}
+
+            delay_lcd(1000000); // Wait for a while before checking again
+    }
 }
