@@ -1,3 +1,5 @@
+#include<LPC17xx.h>
+
 void clear_ports() {
     /* clearing the lines at power on */
     LPC_GPIO0->FIOCLR = 0x0F<<23; // clearing data lines
