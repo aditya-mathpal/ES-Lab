@@ -1,4 +1,3 @@
-#include <LPC17xx.h>
 #include "lcd-disp.c"     // use all the functions of lcd program
 
 void scan(void);
@@ -28,7 +27,7 @@ int main(void)
 
     lcd_init();
 
-    lcd_com(0x80); // point to first line of LCD
+    lcd_comdata(0x80, 0); // point to first line of LCD
     delay_lcd(800);
 
     lcd_puts(&Msg1[0]); // display the message
@@ -70,7 +69,7 @@ int main(void)
             } // end if (key == SCAN_CODE[i])
         } // end for (i = 0; i < 16; i++)
 
-        lcd_com(0xc0); // display in the second line
+        lcd_comdata(0xc0, 0); // display in the second line
         delay_lcd(800);
         lcd_puts(&key);
     } // end while(1)
