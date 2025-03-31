@@ -12,3 +12,5 @@
 test.s
 *.dbgconf
 .vscode/
+*.ini
+*.exe
