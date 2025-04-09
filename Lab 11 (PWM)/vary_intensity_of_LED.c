@@ -30,8 +30,8 @@ int main(void)
 
 void initPWM(void)
 {
-    LPC_PINCON->PINSEL3 |= 0x8000;     // Select  PWM1.4  output  for  Pin1.23,
-    function 2 LPC_PWM1->PCR = 0x1000; // enable PWM1.4, by default it is single Edged
+    LPC_PINCON->PINSEL3 |= 0x8000;     // Select  PWM1.4  output  for  Pin1.23, function 2
+		LPC_PWM1->PCR = 0x1000; // enable PWM1.4, by default it is single Edged
     LPC_PWM1->PR = 0;
     LPC_PWM1->MR0 = 30000;      // period=10ms if pclk=cclk/4
     LPC_PWM1->MCR = (1 << 1);   // Reset PWM TC on PWM1MR0 match
@@ -52,8 +52,6 @@ void delayMS(unsigned int milliseconds) // Using Timer0
     LPC_TIM0->PR = 2;     // Increment TC at every 3 pclk
     LPC_TIM0->TCR = 0x02; // Reset Timer
     LPC_TIM0->TCR = 0x01; // Enable timer
-    while (LPC_TIM0->TC < milliseconds)
-        ; // wait  until  timer  counter  reaches  the
-    desired delay
-        LPC_TIM0->TCR = 0x00; // Disable timer
+    while (LPC_TIM0->TC < milliseconds); // wait  until  timer  counter  reaches  the ndesired delay
+    LPC_TIM0->TCR = 0x00; // Disable timer
 }
